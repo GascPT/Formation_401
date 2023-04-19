@@ -2,7 +2,7 @@
 # Ensure 'Configure SMB v1 server' is set to 'Disabled'
 
 # Set the value for SMB v1 server configuration
-$SMBv1ServerConfig = "Disabled"
+$SMBv1ServerConfig = 0
 
 # Set the registry path for SMB v1 server configuration
 $RegistryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters"
