@@ -18,58 +18,22 @@ def tcp_port_scan(host_ip):
         else:
             filtered_ports.append(port)
 
-    print("Open ports: {}".format(open_ports))
-    print("Closed ports: {}".format(closed_ports))
-    print("Filtered ports: {}".format(filtered_ports))
+    return (open_ports, closed_ports, filtered_ports)
 
-def icmp_ping_sweep(network_address):
-    network = ipaddress.ip_network(network_address)
-    hosts = [str(host) for host in network.hosts()]
-    total_hosts = len(hosts)
-    online_hosts = 0
-    blocked_hosts = 0
-
-    for host in hosts:
-        if host == str(network.network_address) or host == str(network.broadcast_address):
-            continue
-        packet = IP(dst=host)/ICMP()
-        response = sr1(packet, timeout=1, verbose=0)
-        if not response:
-            print("Host {} is down or unresponsive".format(host))
-        elif response.type == 3 and response.code in [1, 2, 3, 9, 10, 13]:
-            print("Host {} is actively blocking ICMP traffic".format(host))
-            blocked_hosts += 1
-        else:
-            print("Host {} is responding".format(host))
-            online_hosts += 1
-            tcp_port_scan(host)
-
-    print("Total hosts: {}".format(total_hosts))
-    print("Online hosts: {}".format(online_hosts))
-    print("Blocked hosts: {}".format(blocked_hosts))
-
-# Prompt the user for the choice of mode
-mode = input("Enter the mode to use (1 for TCP Port Range Scanner, 2 for ICMP Ping Sweep, 3 to ping a single IP address): ")
-
-if mode == "1":
-    # Prompt the user for the host IP address
-    host_ip = input("Enter the host IP address: ")
-    tcp_port_scan(host_ip)
-elif mode == "2":
-    # Prompt the user for the network address
-    network_address = input("Enter the network address including CIDR block (e.g. 10.10.0.0/24): ")
-    icmp_ping_sweep(network_address)
-elif mode == "3":
-    # Prompt the user for the IP address to ping
-    host_ip = input("Enter the host IP address: ")
-    packet = IP(dst=host_ip)/ICMP()
+def scan_host(ip):
+    packet = IP(dst=ip)/ICMP()
     response = sr1(packet, timeout=1, verbose=0)
     if not response:
-        print("Host {} is down or unresponsive".format(host_ip))
+        print("Host is down or unresponsive")
     elif response.type == 3 and response.code in [1, 2, 3, 9, 10, 13]:
-        print("Host {} is actively blocking ICMP traffic".format(host_ip))
+        print("Host is actively blocking ICMP traffic")
     else:
-        print("Host {} is responding".format(host_ip))
-        tcp_port_scan(host_ip)
-else:
-    print("Invalid mode choice. Please try again.")
+        print("Host is up")
+        open_ports, closed_ports, filtered_ports = tcp_port_scan(ip)
+        print("Open ports: {}".format(open_ports))
+        print("Closed ports: {}".format(closed_ports))
+        print("Filtered ports: {}".format(filtered_ports))
+
+# Prompt the user for the host IP address
+ip = input("Enter the IP address to scan: ")
+scan_host(ip)
