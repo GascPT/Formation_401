@@ -1,10 +1,23 @@
 from cryptography.fernet import Fernet
 import os
 
+KEY_FILE = "key.key"
+
+def generate_key():
+    key = Fernet.generate_key()
+    with open(KEY_FILE, "wb") as f:
+        f.write(key)
+    return key
+
+def load_key():
+    with open(KEY_FILE, "rb") as f:
+        key = f.read()
+    return key
+
 def encrypt_file(filepath):
     with open(filepath, "rb") as f:
         data = f.read()
-    key = Fernet.generate_key()
+    key = generate_key()
     fernet = Fernet(key)
     encrypted = fernet.encrypt(data)
     encrypted_filepath = filepath + ".encrypted"
@@ -15,7 +28,7 @@ def encrypt_file(filepath):
 def decrypt_file(filepath):
     with open(filepath, "rb") as f:
         data = f.read()
-    key = Fernet.generate_key()
+    key = load_key()
     fernet = Fernet(key)
     decrypted = fernet.decrypt(data)
     decrypted_filepath = filepath[:-10]
@@ -24,16 +37,18 @@ def decrypt_file(filepath):
     os.remove(filepath)
 
 def encrypt_string(plaintext):
-    key = Fernet.generate_key()
+    key = generate_key()
     fernet = Fernet(key)
     encrypted = fernet.encrypt(plaintext.encode())
-    print(encrypted)
+    print("Encrypted string:", encrypted.decode())
+    return encrypted
 
 def decrypt_string(ciphertext):
-    key = Fernet.generate_key()
+    key = load_key()
     fernet = Fernet(key)
     decrypted = fernet.decrypt(ciphertext.encode())
-    print(decrypted.decode())
+    print("Decrypted string:", decrypted.decode())
+    return decrypted
 
 def main():
     mode = input("Select a mode:\n1. Encrypt a file\n2. Decrypt a file\n3. Encrypt a message\n4. Decrypt a message\n")
@@ -45,7 +60,7 @@ def main():
         decrypt_file(filepath)
     elif mode == "3":
         plaintext = input("Enter cleartext string: ")
-        encrypt_string(plaintext)
+        ciphertext = encrypt_string(plaintext)
     elif mode == "4":
         ciphertext = input("Enter ciphertext string: ")
         decrypt_string(ciphertext)

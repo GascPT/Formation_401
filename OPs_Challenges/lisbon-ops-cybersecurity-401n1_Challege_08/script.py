@@ -2,6 +2,19 @@ from cryptography.fernet import Fernet
 import os
 import ctypes
 
+KEY_FILE = "key.key"
+
+def generate_key():
+    key = Fernet.generate_key()
+    with open(KEY_FILE, "wb") as f:
+        f.write(key)
+    return key
+
+def load_key():
+    with open(KEY_FILE, "rb") as f:
+        key = f.read()
+    return key
+
 
 def encrypt_file(filepath, key):
     with open(filepath, "rb") as f:
@@ -32,7 +45,7 @@ def decrypt_file(filepath, key):
 
 
 def encrypt_directory(directory):
-    key = Fernet.generate_key()
+    key = generate_key()
     fernet = Fernet(key)
 
     for root, dirs, files in os.walk(directory):
@@ -68,14 +81,14 @@ def decrypt_directory(directory):
 
 
 def encrypt_string(plaintext):
-    key = Fernet.generate_key()
+    key = generate_key()
     fernet = Fernet(key)
     encrypted = fernet.encrypt(plaintext.encode())
     print(encrypted)
 
 
 def decrypt_string(ciphertext):
-    key = Fernet.generate_key()
+    key = load_key()
     fernet = Fernet(key)
     decrypted = fernet.decrypt(ciphertext.encode())
     print(decrypted.decode())
@@ -86,12 +99,12 @@ def main():
 
     if mode == "1":
         filepath = input("Enter filepath to target file: ")
-        key = Fernet.generate_key()
+        key = generate_key()
         encrypt_file(filepath, key)
 
     elif mode == "2":
         filepath = input("Enter filepath to target file: ")
-        key = input("Enter key: ")
+        key = load_key()
         decrypt_file(filepath, key)
 
     elif mode == "3":
