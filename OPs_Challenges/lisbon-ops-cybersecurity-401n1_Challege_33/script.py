@@ -3,7 +3,13 @@
 import os
 import hashlib
 from datetime import datetime
-import virustotal_search
+from virustotal_search import VT_Request
+
+from dotenv import load_dotenv
+load_dotenv()
+
+API_KEY=os.getenv('API_KEY')
+
 
 def search_files(directory):
     count_files = 0
@@ -28,8 +34,8 @@ def search_files(directory):
             print(f"File Path: {file_path}")
             print(f"MD5 Hash: {md5_hash}")
             print("-----------------------------------")
-            key=""
-            virustotal_search.VT_Request(key,md5_hash,"ourpur.txt")
+            
+            VT_Request(API_KEY,md5_hash,"output.txt")
             count_hits += 1
 
     print(f"\nSearch complete. Scanned {count_files} files and found {count_hits} hits.")
@@ -51,7 +57,7 @@ def get_user_input(prompt):
     if os.name == 'posix':  # Unix-based systems (Linux)
         return input(prompt)
     else:  # Windows
-        return input(prompt).decode('utf-8')
+        return input(prompt).encode('utf-8')
 
 directory = get_user_input("Enter the directory to search in: ")
 search_files(directory)

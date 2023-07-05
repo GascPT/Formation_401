@@ -48,7 +48,7 @@ def get_user_input(prompt):
     if os.name == 'posix':  # Unix-based systems (Linux)
         return input(prompt)
     else:  # Windows
-        return input(prompt).decode('utf-8')
+        return input(prompt).encode('utf-8')
 
 directory = get_user_input("Enter the directory to search in: ")
 search_files(directory)
