@@ -1,10 +1,8 @@
 
 import subprocess
 
-# Prompt the user for URL or IP address
-target = input("Enter the URL or IP address: ")
 
-# Prompt the user for the port number
+target = input("Enter the URL or IP address: ")
 port = input("Enter the port number: ")
 
 # Perform banner grabbing using netcat
